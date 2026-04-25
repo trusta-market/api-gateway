@@ -10,15 +10,20 @@ spring:
       server:
         webflux:
           routes:
-            - id: inspection-service
+            - id: inspection-service-centers
               uri: lb://inspection-service
               predicates:
-                - Path=/api/inspections/**
+                - Path=/api/v1/centers/**
+
+            - id: inspection-service-inspections
+              uri: lb://inspection-service
+              predicates:
+                - Path=/api/v1/inspections/**
 
             - id: delivery-service
               uri: lb://delivery-service
               predicates:
-                - Path=/api/deliveries/**
+                - Path=/api/v1/deliveries/**
 
           default-filters:
             - AddResponseHeader=X-Gateway, trusta-market
