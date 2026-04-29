@@ -16,13 +16,34 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
+    private static final Set<String> ALLOWED_ROLES = Set.of("ADMIN", "INSPECTOR", "MEMBER");
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // ① JWT 유무와 관계없이 X-User-* 헤더 항상 제거 (spoofing 방지)
+        ServerHttpRequest stripped = exchange.getRequest().mutate()
+                .headers(headers -> {
+                    headers.remove("Authorization");
+                    headers.remove("X-User-UUID");
+                    headers.remove("X-User-Email");
+                    headers.remove("X-User-Role");
+                    headers.remove("X-User-Name");
+                    headers.remove("X-User-Slack-Id");
+                    headers.remove("X-User-Enabled");
+                })
+                .build();
+
+        ServerWebExchange strippedExchange = exchange.mutate()
+                .request(stripped)
+                .build();
+
+        // ② 검증된 JWT에서 유저 정보를 추출하여 내부 라우팅용 헤더에 재주입 (MSA 내부 통신용)
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
@@ -30,20 +51,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .filter(principal -> principal instanceof Jwt)
                 .cast(Jwt.class)
                 .map(jwt -> {
-                    ServerHttpRequest.Builder requestBuilder = exchange.getRequest().mutate();
-
-                    // ① 클라이언트가 보낸 X-User-* 헤더 전부 제거 (spoofing 방지)
-                    requestBuilder.headers(headers -> {
-                        headers.remove("Authorization");
-                        headers.remove("X-User-UUID");
-                        headers.remove("X-User-Email");
-                        headers.remove("X-User-Role");
-                        headers.remove("X-User-Name");
-                        headers.remove("X-User-Slack-Id");
-                        headers.remove("X-User-Enabled");
-                    });
-
-                    // ② 검증된 JWT에서 유저 정보를 추출하여 내부 라우팅용 헤더에 주입 (MSA 내부 통신용)
+                    ServerHttpRequest.Builder requestBuilder = strippedExchange.getRequest().mutate();
                     
                     // 1. 유저 고유 식별자(UUID) 주입
                     if (jwt.getSubject() != null) {
@@ -64,10 +72,9 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                             @SuppressWarnings("unchecked")
                             List<String> roles = (List<String>) rolesObj;
                             String roleString = roles.stream()
-                                    .map(role -> {
-                                        String r = role.toUpperCase();
-                                        return r.startsWith("ROLE_") ? r : "ROLE_" + r;
-                                    })
+                                    .map(String::toUpperCase)
+                                    .filter(ALLOWED_ROLES::contains)
+                                    .map(r -> "ROLE_" + r)
                                     .collect(Collectors.joining(","));
                             if (!roleString.isEmpty()) {
                                 requestBuilder.header("X-User-Role", roleString);
@@ -94,9 +101,9 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                         requestBuilder.header("X-User-Enabled", enabled.toString());
                     }
                     
-                    return exchange.mutate().request(requestBuilder.build()).build();
+                    return strippedExchange.mutate().request(requestBuilder.build()).build();
                 })
-                .defaultIfEmpty(exchange)
+                .defaultIfEmpty(strippedExchange)
                 .flatMap(chain::filter);
     }
 
