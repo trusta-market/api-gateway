@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: api-gateway
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/trusta
 
   cloud:
     gateway:
@@ -24,6 +29,21 @@ spring:
               uri: lb://delivery-service
               predicates:
                 - Path=/api/v1/deliveries/**
+
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/users/**, /api/v1/reports/**
+
+            - id: user-service-admin
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/admin/users/**, /api/v1/admin/reports/**, /api/v1/admin/accounts/**
+
+            - id: user-service-internal
+              uri: lb://user-service
+              predicates:
+                - Path=/internal/users/**
 
           default-filters:
             - AddResponseHeader=X-Gateway, trusta-market
