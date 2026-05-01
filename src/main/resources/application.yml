@@ -40,6 +40,16 @@ spring:
               predicates:
                 - Path=/api/v1/admin/users/**, /api/v1/admin/reports/**, /api/v1/admin/accounts/**
 
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/orders/**
+
+            - id: order-service-admin
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/admin/orders/**
+
           default-filters:
             - AddResponseHeader=X-Gateway, trusta-market
 
