@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/actuator/**").permitAll() // 비인가 링크추가하시면됩니다.
+                        .pathMatchers("/api/v1/users/signup").permitAll()
                         .pathMatchers("/api/v1/admin/**").hasRole("ADMIN") // ADMIN만 접근
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(
