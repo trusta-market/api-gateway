@@ -54,7 +54,7 @@ spring:
               uri: lb://wallet-service
               predicates:
                 - Path=/api/v1/wallets/**
-                -
+
             - id: payment-service
               uri: lb://payment-service
               predicates:
