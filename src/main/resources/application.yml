@@ -50,6 +50,22 @@ spring:
               predicates:
                 - Path=/api/v1/admin/orders/**
 
+            - id: wallet-service
+              uri: lb://wallet-service
+              predicates:
+                - Path=/api/v1/wallets/**
+
+            - id: payment-service
+              uri: lb://payment-service
+              predicates:
+                - Path=/api/v1/payments/**
+
+            - id: payment-service-demo
+              uri: lb://payment-service
+              predicates:
+                - Path=/demo/v1/payments/**
+
+
           default-filters:
             - AddResponseHeader=X-Gateway, trusta-market
 
