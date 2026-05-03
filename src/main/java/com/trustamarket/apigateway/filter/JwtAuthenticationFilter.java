@@ -99,9 +99,10 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                     Boolean enabled = jwt.getClaimAsBoolean("enabled");
                     if (enabled == null) {
                         enabled = true; //나중에 맞출 부분: 운영 환경(Keycloak 관리자 페이지)에서 Protocol Mappers 설정을 통해 JWT 토큰 자체에 "enabled": true 항목이 포함되도록 세팅
+
                         requestBuilder.header("X-User-Enabled", enabled.toString());
                     }
-                    
+                    // 7. 결정된 값을 무조건 헤더에 주입 (if문 밖으로 꺼냄)
                     return strippedExchange.mutate().request(requestBuilder.build()).build();
                 })
                 .defaultIfEmpty(strippedExchange)
