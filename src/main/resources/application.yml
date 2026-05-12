@@ -20,6 +20,11 @@ spring:
               predicates:
                 - Path=/api/v1/centers/**
 
+            - id: inspection-service-admin
+              uri: lb://inspection-service
+              predicates:
+                - Path=/api/v1/admin/inspections/**
+
             - id: inspection-service-inspections
               uri: lb://inspection-service
               predicates:
