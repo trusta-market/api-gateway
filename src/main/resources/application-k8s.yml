@@ -1,0 +1,13 @@
+# K8s 환경 전용 override (SPRING_PROFILES_ACTIVE=k8s 일 때만 로드).
+# 로컬 application.yml 의 localhost 기반 값들을 K8s Service DNS 로 갈음.
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server/eureka/
+
+spring:
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://keycloak/realms/trusta
