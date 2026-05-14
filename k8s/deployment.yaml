@@ -6,6 +6,13 @@ metadata:
     app: api-gateway
 spec:
   replicas: 1
+  # maxSurge=0 — 새 Pod 띄우기 전에 OLD 먼저 죽임. memory 2Gi requests 라
+  # 한 노드에 2개 동시 불가능 → maxSurge=1(기본) 이면 deadlock.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -33,7 +40,7 @@ spec:
               value: "k8s"
           resources:
             requests:
-              cpu: 700m
+              cpu: 500m
               memory: 2Gi
             limits:
               cpu: 1000m
