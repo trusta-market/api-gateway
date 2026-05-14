@@ -5,7 +5,9 @@ metadata:
   labels:
     app: api-gateway
 spec:
-  type: ClusterIP
+  # 외부 진입점 — Cloud Load Balancer 가 자동 프로비저닝 + external IP 할당.
+  # 도메인 서비스는 ClusterIP 유지 (cluster 내부 통신만).
+  type: LoadBalancer
   selector:
     app: api-gateway
   ports:
