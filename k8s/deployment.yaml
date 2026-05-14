@@ -33,11 +33,11 @@ spec:
               value: "k8s"
           resources:
             requests:
-              cpu: 500m
-              memory: 1Gi
+              cpu: 700m
+              memory: 2Gi
             limits:
               cpu: 1000m
-              memory: 2Gi
+              memory: 2500Mi
           # startupProbe — gateway 시작 시 issuer-uri 의 JWKS 가져옴. Keycloak 응답 변동 고려.
           startupProbe:
             httpGet:
