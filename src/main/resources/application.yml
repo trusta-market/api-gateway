@@ -75,6 +75,11 @@ spring:
               predicates:
                 - Path=/demo/v1/payments/**
 
+            - id: notification-service-alerts
+              uri: lb://notification-service
+              predicates:
+                - Path=/api/v1/alerts/**
+
 
           default-filters:
             - AddResponseHeader=X-Gateway, trusta-market
