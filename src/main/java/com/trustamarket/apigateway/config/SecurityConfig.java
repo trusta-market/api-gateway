@@ -30,6 +30,7 @@ public class SecurityConfig {
                         .pathMatchers("/actuator/**").permitAll() // 비인가 링크추가하시면됩니다.
                         .pathMatchers("/api/v1/users/signup").permitAll()
                         .pathMatchers("/demo/v1/payments/**").permitAll()
+                        .pathMatchers("/api/v1/alerts/**").permitAll()
                         .pathMatchers("/api/v1/admin/inspections/**").hasAnyRole("ADMIN", "INSPECTOR")
                         .pathMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyExchange().authenticated())
