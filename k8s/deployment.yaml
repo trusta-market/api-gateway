@@ -38,13 +38,16 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "k8s"
+          # gateway 는 reactor netty 라 Tomcat thread 와 무관. request 는 실 사용량 기반.
+          # limit 은 heap (limit*25%=500MB) + netty direct memory + 기타 = ~1.5GB 안에 맞춤.
+          # request 줄임 → 노드당 pod 수 증가 → HPA scale 자리 확보 (e2-medium 4Gi 노드 기준 3 pod/노드).
           resources:
             requests:
-              cpu: 500m
-              memory: 2Gi
+              cpu: 100m
+              memory: 800Mi
             limits:
-              cpu: 1000m
-              memory: 2500Mi
+              cpu: 1500m
+              memory: 2Gi
           # startupProbe — gateway 시작 시 issuer-uri 의 JWKS 가져옴. Keycloak 응답 변동 고려.
           # timeoutSeconds default 1초 → 부하 시 응답 1초 안 못 함 → fail → restart cycle. 3 으로 늘림.
           startupProbe:
