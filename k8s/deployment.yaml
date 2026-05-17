@@ -46,19 +46,26 @@ spec:
               cpu: 1000m
               memory: 2500Mi
           # startupProbe — gateway 시작 시 issuer-uri 의 JWKS 가져옴. Keycloak 응답 변동 고려.
+          # timeoutSeconds default 1초 → 부하 시 응답 1초 안 못 함 → fail → restart cycle. 3 으로 늘림.
           startupProbe:
             httpGet:
               path: /actuator/health
               port: 8080
             failureThreshold: 30
             periodSeconds: 5
+            timeoutSeconds: 3
+          # 부하 중 한 번 응답 늦었다고 죽이지 않게 failureThreshold 늘림 (default 3 → 5).
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 5
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8080
             periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 5
