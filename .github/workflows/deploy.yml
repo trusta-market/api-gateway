@@ -47,5 +47,8 @@ jobs:
       - name: Apply Service
         run: kubectl apply -f k8s/service.yaml
 
+      - name: Apply HPA
+        run: kubectl apply -f k8s/hpa.yaml
+
       - name: Wait for rollout
         run: kubectl rollout status deployment/api-gateway --timeout=5m
