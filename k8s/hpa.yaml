@@ -1,22 +1,23 @@
-# Phase 1 미적용 — 매니페스트만 두고 kubectl apply 안 함.
-# Phase 2 부하 테스트 시 활성화 (PRD §8).
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: api-gateway
-  labels:
-    app: api-gateway
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: api-gateway
-  minReplicas: 1
-  maxReplicas: 5
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70
+# HPA 비활성 (부하 측정 시 일관된 환경 위해 replicas 1 고정).
+# 활성화 시 아래 주석 풀고 workflow 의 'Apply HPA' step 도 같이 활성화.
+#
+# apiVersion: autoscaling/v2
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: api-gateway
+#   labels:
+#     app: api-gateway
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: api-gateway
+#   minReplicas: 1
+#   maxReplicas: 5
+#   metrics:
+#     - type: Resource
+#       resource:
+#         name: cpu
+#         target:
+#           type: Utilization
+#           averageUtilization: 70
