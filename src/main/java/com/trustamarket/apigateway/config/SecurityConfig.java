@@ -33,6 +33,8 @@ public class SecurityConfig {
                         .pathMatchers("/api/v1/alerts/**").permitAll()
                         .pathMatchers("/api/v1/admin/inspections/**").hasAnyRole("ADMIN", "INSPECTOR")
                         .pathMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        // Swagger UI aggregation — ADMIN 만 접근. 8 MSA 의 spec 을 한 화면에 토글.
+                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**").hasRole("ADMIN")
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));

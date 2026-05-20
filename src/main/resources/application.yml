@@ -80,6 +80,57 @@ spring:
               predicates:
                 - Path=/api/v1/alerts/**
 
+            # ── Swagger / OpenAPI aggregation ──
+            # 각 서비스의 /v3/api-docs 를 api-gateway 가 fetch — swagger-ui.urls 가 참조.
+            # Path rewrite — 외부 /v3/api-docs/<service> → 내부 /v3/api-docs.
+            - id: openapi-user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/v3/api-docs/user-service
+              filters:
+                - RewritePath=/v3/api-docs/user-service, /v3/api-docs
+            - id: openapi-product-service
+              uri: lb://product-service
+              predicates:
+                - Path=/v3/api-docs/product-service
+              filters:
+                - RewritePath=/v3/api-docs/product-service, /v3/api-docs
+            - id: openapi-order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/v3/api-docs/order-service
+              filters:
+                - RewritePath=/v3/api-docs/order-service, /v3/api-docs
+            - id: openapi-payment-service
+              uri: lb://payment-service
+              predicates:
+                - Path=/v3/api-docs/payment-service
+              filters:
+                - RewritePath=/v3/api-docs/payment-service, /v3/api-docs
+            - id: openapi-wallet-service
+              uri: lb://wallet-service
+              predicates:
+                - Path=/v3/api-docs/wallet-service
+              filters:
+                - RewritePath=/v3/api-docs/wallet-service, /v3/api-docs
+            - id: openapi-delivery-service
+              uri: lb://delivery-service
+              predicates:
+                - Path=/v3/api-docs/delivery-service
+              filters:
+                - RewritePath=/v3/api-docs/delivery-service, /v3/api-docs
+            - id: openapi-notification-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/v3/api-docs/notification-service
+              filters:
+                - RewritePath=/v3/api-docs/notification-service, /v3/api-docs
+            - id: openapi-inspection-service
+              uri: lb://inspection-service
+              predicates:
+                - Path=/v3/api-docs/inspection-service
+              filters:
+                - RewritePath=/v3/api-docs/inspection-service, /v3/api-docs
 
           default-filters:
             - AddResponseHeader=X-Gateway, trusta-market
@@ -108,3 +159,26 @@ management:
     web:
       exposure:
         include: health, info, gateway, prometheus
+
+# Swagger UI aggregation — 8 MSA 의 OpenAPI spec 을 한 UI 에서 토글.
+# 외부 노출 보호는 SecurityConfig 에서 ADMIN role 로.
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: user-service
+        url: /v3/api-docs/user-service
+      - name: product-service
+        url: /v3/api-docs/product-service
+      - name: order-service
+        url: /v3/api-docs/order-service
+      - name: payment-service
+        url: /v3/api-docs/payment-service
+      - name: wallet-service
+        url: /v3/api-docs/wallet-service
+      - name: delivery-service
+        url: /v3/api-docs/delivery-service
+      - name: notification-service
+        url: /v3/api-docs/notification-service
+      - name: inspection-service
+        url: /v3/api-docs/inspection-service
