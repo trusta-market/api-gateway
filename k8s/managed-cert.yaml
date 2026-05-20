@@ -1,0 +1,10 @@
+# GKE Managed Certificate — Google 이 자동 발급 / 갱신.
+# 도메인의 DNS A 레코드가 Ingress IP (trusta-gateway-ip) 를 가리켜야 검증 통과 → Active.
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: trusta-gateway-cert
+  namespace: default
+spec:
+  domains:
+    - trusta-market.site

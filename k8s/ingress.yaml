@@ -1,0 +1,17 @@
+# HTTPS Ingress — Global Application LB + Google Managed Cert.
+# trusta-gateway-ip (8.233.50.2) static IP 에 attach 됨. DNS A 레코드도 이 IP 로 업데이트 필요.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: trusta-gateway-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: gce
+    kubernetes.io/ingress.global-static-ip-name: trusta-gateway-ip
+    networking.gke.io/managed-certificates: trusta-gateway-cert
+spec:
+  defaultBackend:
+    service:
+      name: api-gateway-internal
+      port:
+        number: 80
