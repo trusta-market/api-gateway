@@ -33,8 +33,11 @@ public class SecurityConfig {
                         .pathMatchers("/api/v1/alerts/**").permitAll()
                         .pathMatchers("/api/v1/admin/inspections/**").hasAnyRole("ADMIN", "INSPECTOR")
                         .pathMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        // Swagger UI aggregation — ADMIN 만 접근. 8 MSA 의 spec 을 한 화면에 토글.
-                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**").hasRole("ADMIN")
+                        // Swagger UI 정적 페이지 — 누구나 열기 가능 (HTML/JS/CSS).
+                        // 실제 spec / try-out 은 ADMIN JWT 필요 (Authorize 버튼에 토큰 넣으면 동작).
+                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/webjars/**").permitAll()
+                        // Spec / try-out — ADMIN role 필요. swagger UI 가 Authorization 헤더로 호출.
+                        .pathMatchers("/v3/api-docs/**").hasRole("ADMIN")
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
