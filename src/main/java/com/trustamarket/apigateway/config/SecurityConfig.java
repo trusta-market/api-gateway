@@ -33,11 +33,10 @@ public class SecurityConfig {
                         .pathMatchers("/api/v1/alerts/**").permitAll()
                         .pathMatchers("/api/v1/admin/inspections/**").hasAnyRole("ADMIN", "INSPECTOR")
                         .pathMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        // Swagger UI 정적 페이지 — 누구나 열기 가능 (HTML/JS/CSS).
-                        // 실제 spec / try-out 은 ADMIN JWT 필요 (Authorize 버튼에 토큰 넣으면 동작).
-                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/webjars/**").permitAll()
-                        // Spec / try-out — ADMIN role 필요. swagger UI 가 Authorization 헤더로 호출.
-                        .pathMatchers("/v3/api-docs/**").hasRole("ADMIN")
+                        // Swagger UI + OpenAPI spec — 누구나 접근 가능 (정적 메타데이터).
+                        // 실제 비즈니스 API (POST /api/v1/orders 등) 는 각 컨트롤러 @PreAuthorize 로 보호.
+                        // spec 노출은 메타데이터일 뿐, 실제 데이터 / 실행은 JWT 없이 불가.
+                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/v3/api-docs/**").permitAll()
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
