@@ -45,7 +45,9 @@ spec:
             - containerPort: 8080
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: "k8s"
+              value: "dev"
+            - name: SPRING_CONFIG_IMPORT
+              value: "configserver:http://config-server"
           # 부하 측정 시 일관된 환경 위해 limit 제거 (variable 줄임). burst 시 노드 free 까지 사용 — 터져도 OK.
           # request 만 유지 (스케줄링 위해).
           resources:
