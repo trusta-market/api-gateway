@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
+  cloud:
+    config:
+      label: ${SPRING_CLOUD_CONFIG_LABEL:develop}
+      fail-fast: ${SPRING_CLOUD_CONFIG_FAIL_FAST:false}
