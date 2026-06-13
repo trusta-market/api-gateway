@@ -5,9 +5,9 @@ metadata:
   labels:
     app: api-gateway
 spec:
-  replicas: 1
-  # maxSurge=0 — 새 Pod 띄우기 전에 OLD 먼저 죽임. memory 2Gi requests 라
-  # 한 노드에 2개 동시 불가능 → maxSurge=1(기본) 이면 deadlock.
+  replicas: 2   # cycle-1 m01: 단일 노드 CPU 포화(~875 VU) 완화 위한 수평 확장 (s96q + 빈 노드 bknm)
+  # maxSurge=0 — 새 Pod 띄우기 전에 OLD 먼저 죽임. anti-affinity 로 한 노드에 2개 동시 불가능 →
+  # maxSurge=1(기본) 이면 surge Pod 가 들어갈 노드가 없어 deadlock.
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -28,6 +28,7 @@ spec:
                 matchExpressions:
                   - key: app
                     operator: Exists
+              namespaces: ["default", "kafka"]   # default 비즈니스 + kafka 제외 (gmp-system DaemonSet 만 허용) → 비즈니스·kafka 노드 경합 회피, 모니터링만 있는 노드로 배치
               topologyKey: kubernetes.io/hostname
       securityContext:
         runAsNonRoot: true
